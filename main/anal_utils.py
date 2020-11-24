@@ -9,7 +9,7 @@ import re
 import numpy as np
 from numpy import mean
 from torchstat import stat
-import main.utils as utils
+import utils as utils
 import torch.nn.functional as F
 
 

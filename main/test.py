@@ -14,7 +14,7 @@ from sklearn import metrics
 import os
 import argparse
 
-from main.models import AlexNet
+from models import AlexNet
 from data import imagenet
 from prune_paper.models import *
 

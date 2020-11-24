@@ -9,8 +9,8 @@ import argparse
 
 from torch import nn
 
-from main import utils
-from main.anal_utils import reset_kernel_by_list, get_model, get_conv_name_list, get_net_by_prune_dict, \
+import utils
+from anal_utils import reset_kernel_by_list, get_model, get_conv_name_list, get_net_by_prune_dict, \
     get_conv_idx_by_name, search_by_conv_idx
 from main.resnet34 import resnet_34
 from main.models import *
