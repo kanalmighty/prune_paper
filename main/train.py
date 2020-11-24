@@ -89,8 +89,8 @@ trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batc
 # Model
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-baseline_dir = os.path.join(project_root_path, Path('baseline'))
-if not baseline_dir.exists():
+baseline_dir = os.path.join(project_root_path, 'baseline')
+if not Path(baseline_dir.exists()):
     os.mkdir(baseline_dir)
 
 
