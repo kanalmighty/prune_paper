@@ -43,8 +43,8 @@ parser.add_argument(
 parser.add_argument(
     '--resume',
     type=str,
-    # default=None,
-    default='vgg_16_bn_cifar100.pth',
+    default=None,
+    # default='vgg_16_bn_cifar100.pth',
     help='load the model from the specified checkpoint')
 
 parser.add_argument(
