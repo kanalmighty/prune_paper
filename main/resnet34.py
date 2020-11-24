@@ -101,7 +101,7 @@ class ResNet(nn.Module):
         #                      256, 256, 256, 256, 256, 256, 256, 256, 512, 512, 512, 512]
         if conv_dropout_list is None:
             conv_dropout_list = [-1 for i in range(31)]
-        from main.anal_utils import get_prune_mask, fix_shutcut_tensor
+        from anal_utils import get_prune_mask, fix_shutcut_tensor
         origin_x = self.feature99(origin_x)
         origin_x = self.max_pool(origin_x)
 

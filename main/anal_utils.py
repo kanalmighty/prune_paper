@@ -13,8 +13,8 @@ import utils as utils
 import torch.nn.functional as F
 
 
-from main.models import *
-from main.resnet34 import resnet_34
+from models import *
+from resnet34 import resnet_34
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 layer_mean = []
 layer_zeros=[]
