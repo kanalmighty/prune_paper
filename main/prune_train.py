@@ -15,7 +15,7 @@ import utils
 from anal_utils import reset_kernel_by_list, get_model, get_conv_name_list, get_net_by_prune_dict, \
     get_conv_idx_by_name, search_by_conv_idx
 from resnet34 import resnet_34
-from .models import *
+from models import *
 from utils import get_loaders
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
