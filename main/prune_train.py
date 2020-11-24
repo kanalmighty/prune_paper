@@ -77,15 +77,18 @@ best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 lr_decay_step = list(map(int, args.lr_decay_step.split(',')))
 
-baseline_dir = Path('tmp')
-if not baseline_dir.exists():
-    os.mkdir(baseline_dir)
-print(vars(args))
 
 
 trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size)
 
 project_root_path = os.path.abspath(os.path.dirname(__file__))
+tmp_dir = os.path.join(project_root_path, 'tmp')
+
+
+if not Path(tmp_dir).exists():
+    os.mkdir(tmp_dir)
+print(vars(args))
+
 # Model
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
@@ -93,7 +96,7 @@ def prune_train():
 
 
     print('checkpoint %s exists,train from checkpoint' % args.resume)
-    save_path = os.path.join(project_root_path, 'tmp', args.resume)
+    save_path = os.path.join(tmp_dir, args.resume)
     model_state = get_model(args.resume, device=device)
 
 
@@ -232,7 +235,7 @@ def prune_train():
                     'cfg': pruned_cfg,
                 }
                 torch.save(model_state, save_path)
-                best_model_path = os.path.join(project_root_path, 'tmp', str(lasted_best_prec1)+'_'+conv_layername+'.pth')
+                best_model_path = os.path.join(tmp_dir, str(lasted_best_prec1)+'_'+conv_layername+'.pth')
                 torch.save(model_state, best_model_path)
 
 
