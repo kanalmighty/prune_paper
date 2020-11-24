@@ -7,7 +7,7 @@ import time
 from sklearn.metrics import accuracy_score, recall_score, precision_score
 from torchstat import stat
 
-from  prune_paper.main.anal_utils import *
+from  main.anal_utils import *
 import torchvision
 import torchvision.transforms as transforms
 from sklearn import metrics

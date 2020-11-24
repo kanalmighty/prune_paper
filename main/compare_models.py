@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
-from  prune_paper.main.anal_utils import *
+from  main.anal_utils import *
 import torchvision
 import torchvision.transforms as transforms
 
