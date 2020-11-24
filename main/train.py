@@ -89,7 +89,7 @@ trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batc
 # Model
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-baseline_dir = Path('baseline')
+baseline_dir = os.path.join(project_root_path, Path('baseline'))
 if not baseline_dir.exists():
     os.mkdir(baseline_dir)
 
@@ -100,7 +100,7 @@ def train_baseline():
 
     if args.resume:
         print('checkpoint %s exists,train from checkpoint' % args.resume)
-        save_path = os.path.join(project_root_path, 'baseline', args.resume)
+        save_path = os.path.join(baseline_dir, args.resume)
         # model_state = torch.load(args.resume, map_location=device)
         model_state = get_model(args.resume, device=device)
         cfg = model_state['cfg']
@@ -119,7 +119,7 @@ def train_baseline():
             start_epoch = 0
         end_epoch = start_epoch + 80
     else:
-        save_path = os.path.join(project_root_path, 'baseline', args.arch+'_' + args.dataset+'.pth')
+        save_path = os.path.join(baseline_dir, args.arch+'_' + args.dataset+'.pth')
         current_model_best_acc = 0
         net = eval(args.arch)(args.num_class)
         cfg = net.cfg
