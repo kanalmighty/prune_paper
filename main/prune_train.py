@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torch
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
@@ -14,7 +16,7 @@ from anal_utils import reset_kernel_by_list, get_model, get_conv_name_list, get_
     get_conv_idx_by_name, search_by_conv_idx
 from main.resnet34 import resnet_34
 from main.models import *
-from main.utils import get_loaders
+from utils import get_loaders
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument(
@@ -75,7 +77,9 @@ best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 lr_decay_step = list(map(int, args.lr_decay_step.split(',')))
 
-
+baseline_dir = Path('tmp')
+if not baseline_dir.exists():
+    os.mkdir(baseline_dir)
 print(vars(args))
 
 
