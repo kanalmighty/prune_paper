@@ -7,7 +7,7 @@ import time
 from sklearn.metrics import accuracy_score, recall_score, precision_score
 from torchstat import stat
 
-from  main.anal_utils import *
+from  prune_paper.main.anal_utils import *
 import torchvision
 import torchvision.transforms as transforms
 from sklearn import metrics
@@ -16,10 +16,8 @@ import argparse
 
 from main.models import AlexNet
 from data import imagenet
-from models import *
+from prune_paper.models import *
 
-from mask import *
-import utils
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
