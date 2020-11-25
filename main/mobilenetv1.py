@@ -60,6 +60,7 @@ class Conv_Dw(nn.Module):
 
 def mobile_net_v1(num_class, cfg=None):
     origin_cfg = [32, 64, 128, 128, 256, 256, 256, 512, 512, 512, 512, 512, 512, 1024]
+    cfg = origin_cfg if cfg is None else cfg
     return Mobile_Net(num_class, cfg=cfg, origin_cfg=origin_cfg)
 
 if __name__ == '__main__':

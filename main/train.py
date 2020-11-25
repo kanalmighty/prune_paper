@@ -98,7 +98,7 @@ if not Path(baseline_dir).exists():
 # Training
 def train_baseline():
 
-    if args.resume == "none":
+    if args.resume is not "none":
         print('checkpoint %s exists,train from checkpoint' % args.resume)
         save_path = os.path.join(baseline_dir, args.resume)
         # model_state = torch.load(args.resume, map_location=device)
