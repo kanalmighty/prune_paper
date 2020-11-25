@@ -27,7 +27,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar100',
+    default='cifar10',
     choices=('cifar10','cifar100'),
     help='dataset')
 parser.add_argument(

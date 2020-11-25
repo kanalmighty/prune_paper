@@ -43,7 +43,7 @@ parser.add_argument(
 parser.add_argument(
     '--resume',
     type=str,
-    default=None,
+    default="none",
     # default='mobile_net_v1_cifar10.pth',
     help='load the model from the specified checkpoint')
 
@@ -98,7 +98,7 @@ if not Path(baseline_dir).exists():
 # Training
 def train_baseline():
 
-    if args.resume:
+    if args.resume == "none":
         print('checkpoint %s exists,train from checkpoint' % args.resume)
         save_path = os.path.join(baseline_dir, args.resume)
         # model_state = torch.load(args.resume, map_location=device)
