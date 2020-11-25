@@ -11,7 +11,7 @@ from numpy import mean
 from torchstat import stat
 import utils as utils
 import torch.nn.functional as F
-
+from mobilenetv1 import mobile_net_v1
 
 from models import *
 from resnet34 import resnet_34
@@ -269,11 +269,11 @@ def search_by_conv_idx(model_state_dict, origin_cfg,conv_name, conv_idx, conv_li
 #获取所有卷积层名称
 def get_conv_name_list(model_state_dict):
     conv_list= []
-
+    conv_group_pattern = re.compile(r'feature.*conv.*group.weight')
 
     conv_pattern = re.compile(r'feature.*conv.*weight')
     for name, parameter in model_state_dict['state_dict'].items():
-        if conv_pattern.match(name):
+        if conv_pattern.match(name) and conv_group_pattern.match(name) is None:
             conv_list.append(name)
     return conv_list
 
@@ -303,7 +303,6 @@ def get_parameter_by_list(prtrained_model_name, thres_cfg):
 
 
 def test_model(model_state, testloader, args, conv_dropout_list):
-    # net = eval(args.arch)(args.num_class, cfg=model_state['cfg'])
     net = eval(args.arch)(args.num_class, cfg=model_state['cfg'])
     net = net.cuda()
     net.load_state_dict(model_state['state_dict'])
@@ -338,6 +337,7 @@ def get_prune_model(pretrained_model, thres_cfg, strategy,args):
 
 
     conv_pattern = re.compile(r'feature.*conv.*weight')
+    conv_group_pattern = re.compile(r'feature.*conv.*group.weight')
     bias_pattern = re.compile(r'feature.*conv.*bias')
     norm_pattern = re.compile(r'feature.*norm.*')
     linear1_pattern = re.compile(r'classifier.*.*')  # 处理分类器
@@ -351,19 +351,24 @@ def get_prune_model(pretrained_model, thres_cfg, strategy,args):
                 prune_thres = thres_cfg[idx]
             except IndexError:
                 prune_thres = thres_cfg[0]
-            current_output_channel_mask = get_prune_mask(strategy, parameter, prune_thres)
-            current_output_channel_mask = current_output_channel_mask.bool()
-            parameter = parameter[current_output_channel_mask]
 
-            newcfg.append(current_output_channel_mask.sum().item())
-            idx += 1
-            parameter = parameter[:, previous_output_mask]
+
+
+
+            #如果不是分组卷积
+            if conv_group_pattern.match(name) is None:
+                current_output_channel_mask = get_prune_mask(strategy, parameter, prune_thres)
+                current_output_channel_mask = current_output_channel_mask.bool()
+                parameter = parameter[current_output_channel_mask]
+                parameter = parameter[:, previous_output_mask]
+                idx += 1
+                newcfg.append(current_output_channel_mask.sum().item())
             all_parameter[name] = parameter
             previous_output_mask = current_output_channel_mask
         elif (bias_pattern.match(name) or norm_pattern.match(name)) and 'num_batches_tracked' not in name:
             all_parameter[name] = parameter[current_output_channel_mask]
             previous_output_mask = current_output_channel_mask
-        elif linear1_pattern.match(name) and 'num_batches_tracked' not in name:
+        elif linear1_pattern.match(name) and 'num_batches_tracked' not in name and 'bias' not in name:
             if 'linear1.weight' in name and args.arch is not 'AlexNet':
                 all_parameter[name] = parameter[:, current_output_channel_mask]
                 previous_output_mask = current_output_channel_mask
@@ -377,12 +382,13 @@ def get_prune_model(pretrained_model, thres_cfg, strategy,args):
                 expanded_current_output_channel_mask = (current_output_channel_mask.long() * expand_tensor.long()).t().reshape(1, -1).squeeze()
                 all_parameter[name] = parameter[:, expanded_current_output_channel_mask.bool()]
                 previous_output_mask = current_output_channel_mask
+
             elif (args.arch == 'resnet_56' or args.arch == 'resnet_34') and 'bias' not in name:
                 all_parameter[name] = parameter[:, current_output_channel_mask]
                 previous_output_mask = current_output_channel_mask
-            # else:
-            #     all_parameter[name] = parameter[ ~current_output_channel_mask]
-            #     previous_output_mask = ~current_output_channel_mask
+            else:
+                all_parameter[name] = parameter[:, current_output_channel_mask]
+                previous_output_mask = ~current_output_channel_mask
 
     # vgg_cfg = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 512] 最后两个数字是l1的输入，输出和l2的输入
     # newcfg.insert(2, 'M')

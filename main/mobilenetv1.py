@@ -23,11 +23,11 @@ class Mobile_Net(nn.Module):
             Conv_Dw(self.cfg[12], self.cfg[13], 1),
             nn.AvgPool2d(7),
         )
-        self.classifier = nn.Linear(1024, num_class)
+        self.classifier = nn.Linear(self.cfg[13], num_class)
 
-    def forward(self, x):
+    def forward(self, x,conv_drop_list):
         x = self.feature(x)
-        x = x.view(-1, 1024)
+        x = x.view(-1, self.cfg[13])
         x = self.classifier(x)
         return x
 
@@ -47,7 +47,7 @@ class Conv_Dw(nn.Module):
         def __init__(self, inp, oup, stride):
             super(Conv_Dw, self).__init__()
             self.layers = nn.Sequential()
-            self.layers.add_module('conv1', nn.Conv2d(inp, inp, 3, stride, 1, groups=inp, bias=False))
+            self.layers.add_module('conv1_group', nn.Conv2d(inp, inp, 3, stride, 1, groups=inp, bias=False))
             self.layers.add_module('norm1', nn.BatchNorm2d(inp))
             self.layers.add_module('relu', nn.ReLU(inplace=True))
 
@@ -60,7 +60,7 @@ class Conv_Dw(nn.Module):
 
 def mobile_net_v1(num_class, cfg=None):
     origin_cfg = [32, 64, 128, 128, 256, 256, 256, 512, 512, 512, 512, 512, 512, 1024]
-    return Mobile_Net(num_class, cfg=origin_cfg, origin_cfg=origin_cfg)
+    return Mobile_Net(num_class, cfg=cfg, origin_cfg=origin_cfg)
 
 if __name__ == '__main__':
     net = Mobile_Net()
