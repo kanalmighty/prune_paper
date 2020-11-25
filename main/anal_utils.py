@@ -312,7 +312,7 @@ def test_model(model_state, testloader, args, conv_dropout_list):
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
-            outputs = net(inputs, conv_dropout_list)
+            outputs = net(inputs)
 
             prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
             top1.update(prec1[0], inputs.size(0))

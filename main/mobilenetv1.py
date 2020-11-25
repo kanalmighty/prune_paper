@@ -25,7 +25,7 @@ class Mobile_Net(nn.Module):
         )
         self.classifier = nn.Linear(self.cfg[13], num_class)
 
-    def forward(self, x,conv_drop_list):
+    def forward(self, x):
         x = self.feature(x)
         x = x.view(-1, self.cfg[13])
         x = self.classifier(x)
