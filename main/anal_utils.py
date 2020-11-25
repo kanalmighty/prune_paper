@@ -230,9 +230,9 @@ def search_by_conv_idx(model_state_dict, origin_cfg,conv_name, conv_idx, conv_li
     kernel_dropout_set = set()
     for kernel_idx in range(origin_kernel_num):
         #获取卷积核数据
-        kernel_mean,kernel_sum,kernel_var,kernel_norm = get_kernel_analyse_by_id(args.resume,conv_name,kernel_idx)
+        # kernel_mean,kernel_sum,kernel_var,kernel_norm = get_kernel_analyse_by_id(args.resume,conv_name,kernel_idx)
         # print('共%d个卷积核，当前尝试删除第%d个卷积核,sum为%f,mean为%f,norm为%f,var为%f' % (origin_kernel_num, kernel_idx, kernel_mean, kernel_sum, kernel_norm,kernel_var))
-        print('%f,%f,%f,%f' % (kernel_mean, kernel_sum, kernel_norm, kernel_var))
+        # print('%f,%f,%f,%f' % (kernel_mean, kernel_sum, kernel_norm, kernel_var))
         conv_dropout_list[conv_idx] = [kernel_idx]
         conv_dropout_list_resnet34[conv_idx] = [kernel_idx]
         # print('输入get_pruned_model的dropout配置为' + str(conv_dropout_list))

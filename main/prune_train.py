@@ -188,7 +188,7 @@ def prune_train():
                     inputs = inputs.to(device)
                     targets = targets.to(device)
                     optimizer.zero_grad()
-                    outputs = net_current_pruned(inputs,total_drop_list_resnet34)
+                    outputs = net_current_pruned(inputs)
                     loss = criterion(outputs, targets)
                     loss.backward()
                     optimizer.step()
