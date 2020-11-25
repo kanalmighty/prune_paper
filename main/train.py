@@ -8,7 +8,7 @@ import torchvision
 import torchvision.transforms as transforms
 import os
 import argparse
-
+from mobilenetv1 import mobile_net_v1
 from torch import nn
 
 import utils
@@ -27,7 +27,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar100',
+    default='cifar10',
     choices=('cifar10','cifar100'),
     help='dataset')
 parser.add_argument(
@@ -43,8 +43,8 @@ parser.add_argument(
 parser.add_argument(
     '--resume',
     type=str,
-    default=None,
-    # default='vgg_16_bn_cifar100.pth',
+    # default=None,
+    default='mobile_net_v1_cifar10.pth',
     help='load the model from the specified checkpoint')
 
 parser.add_argument(
@@ -61,13 +61,13 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='vgg_16_bn',
-    choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn'),
+    default='mobile_net_v1',
+    choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='100'),
+    default='10'),
 parser.add_argument(
     '--drop_train',
     type=str,
