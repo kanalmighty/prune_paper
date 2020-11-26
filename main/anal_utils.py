@@ -244,7 +244,7 @@ def search_by_conv_idx(model_state_dict, origin_cfg,conv_name, conv_idx, conv_li
         pruned_model_state = get_prune_model(model_state_dict['state_dict'], conv_dropout_list, 'fix',args)
         pruned_model_state_dict['state_dict'] = pruned_model_state['state_dict']
         pruned_model_state_dict['cfg'] = utils.resore_cfg_maxpool(origin_cfg, pruned_model_state['cfg'])
-        # top1 = random.randint(-20,30)
+        # top1 = random.randint(-20,80)
         top1 = test_model(pruned_model_state_dict, testloader, args, conv_dropout_list_resnet34)
         # for i in pm.dropout_index:
         #     if isinstance(i, list):
@@ -368,6 +368,8 @@ def get_prune_model(pretrained_model, thres_cfg, strategy,args):
                 parameter = parameter[:, previous_output_mask]
                 idx += 1
                 newcfg.append(current_output_channel_mask.sum().item())
+            else:
+                parameter = parameter[current_output_channel_mask]
             all_parameter[name] = parameter
             previous_output_mask = current_output_channel_mask
         elif (bias_pattern.match(name) or norm_pattern.match(name)) and 'num_batches_tracked' not in name:

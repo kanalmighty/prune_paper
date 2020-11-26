@@ -45,7 +45,7 @@ parser.add_argument(
     '--resume',
     type=str,
     # default=None,
-    default="mobile_net_v1_cifar10.pth",
+    default="mobile_net_v1_cifar10_pruning.pth",
     help='load the model from the specified checkpoint')
 parser.add_argument(
     '--train_batch_size',
