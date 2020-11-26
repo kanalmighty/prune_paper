@@ -1,6 +1,8 @@
 import copy
 import os
 import random
+import sys
+
 import matplotlib.pyplot as plt
 import datetime
 import glob
@@ -20,8 +22,11 @@ layer_mean = []
 layer_zeros=[]
 total_var = []
 def get_model(model_name, device):
-    project_root_path = os.path.abspath(os.path.dirname(__file__))
-    pth_path = project_root_path + os.sep + '*' + os.sep + '*.pth'
+    if sys.platform == 'linux':
+        pth_path = '/content/drive/MyDrive/*.pth'
+    else:
+        project_root_path = os.path.abspath(os.path.dirname(__file__))
+        pth_path = project_root_path + os.sep + '*' + os.sep + '*.pth'
     for file in glob.glob(pth_path):
         if model_name in file:
             model = torch.load(file, map_location=device)
