@@ -212,7 +212,7 @@ def prune_train():
             with torch.no_grad():
                 for batch_idx, (inputs, targets) in enumerate(testloader):
                     inputs, targets = inputs.to(device), targets.to(device)
-                    outputs = net_current_pruned(inputs,total_drop_list_resnet34)
+                    outputs = net_current_pruned(inputs)
 
                     prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
                     top1.update(prec1[0], inputs.size(0))
