@@ -82,7 +82,7 @@ lr_decay_step = list(map(int, args.lr_decay_step.split(',')))
 trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size)
 
 project_root_path = os.path.abspath(os.path.dirname(__file__))
-tmp_dir = os.path.join(project_root_path, 'tmp')
+tmp_dir = os.path.join(project_root_path, '/content/drive/MyDrive')
 
 
 if not Path(tmp_dir).exists():
