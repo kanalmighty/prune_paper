@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar10',
+    default='cifar100',
     choices=('cifar10','cifar100'),
     help='dataset')
 parser.add_argument(
@@ -62,13 +62,13 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='mobile_net_v1',
+    default='vgg_16_bn',
     choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='10'),
+    default='100'),
 parser.add_argument(
     '--drop_train',
     type=str,
@@ -85,7 +85,7 @@ lr_decay_step = list(map(int, args.lr_decay_step.split(',')))
 print(vars(args))
 
 project_root_path = os.path.abspath(os.path.dirname(__file__))
-trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size)
+trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size,args.arch)
 
 # Model
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'

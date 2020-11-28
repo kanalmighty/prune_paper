@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar10',
+    default='cifar100',
     choices=('cifar10','cifar100'),
     help='dataset')
 parser.add_argument(
@@ -45,7 +45,7 @@ parser.add_argument(
     '--resume',
     type=str,
     # default=None,
-    default="mobile_net_v1_cifar10_pruning.pth",
+    default="mobile_net_v1_cifar100_pruning.pth",
     help='load the model from the specified checkpoint')
 parser.add_argument(
     '--train_batch_size',
@@ -60,12 +60,12 @@ parser.add_argument(
 parser.add_argument(
     '--prune_rate',
     type=float,
-    default=0.7,
+    default=0.9,
     help='prune rate')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='10')
+    default='100')
 parser.add_argument(
     '--arch',
     type=str,
@@ -80,7 +80,7 @@ lr_decay_step = list(map(int, args.lr_decay_step.split(',')))
 
 
 
-trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size)
+trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size,args.arch)
 
 project_root_path = os.path.abspath(os.path.dirname(__file__))
 if sys.platform == 'linux':
