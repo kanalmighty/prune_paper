@@ -45,7 +45,7 @@ parser.add_argument(
     '--resume',
     type=str,
     default="none",
-    # default='mobile_net_v1_cifar10.pth',
+    # default='vgg_16_bn_cifar100.pth',
     help='load the model from the specified checkpoint')
 
 parser.add_argument(

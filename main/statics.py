@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument(
     '--model_name',
     type=str,
-    default='66.43000030517578_feature.conv16.weight_vgg16_100_0.8.pth',
+    default='mobile_net_v1_cifar100.pth',
     help='dataset path')
 parser.add_argument(
     '--data_dir',
@@ -43,7 +43,7 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='vgg_16_bn',
+    default='mobile_net_v1',
     choices=('resnet_34','vgg_16_bn','vgg_19_bn','alexnet','densenet_40','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(
@@ -100,14 +100,16 @@ def test():
     recall_micro = 0
     precision_macro = 0
     precision_micro = 0
+    top1 = utils.AverageMeter()
+    top5 = utils.AverageMeter()
+    net.eval()
     with torch.no_grad():
         start_time = time.time()
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
 
             outputs = net(inputs)
-            top1 = utils.AverageMeter()
-            top5 = utils.AverageMeter()
+
             prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
             top1.update(prec1[0], inputs.size(0))
             top5.update(prec5[0], inputs.size(0))
@@ -137,47 +139,20 @@ def test():
             # precision_macro += precision_score(y_true, y_pred, average='macro')
 
             # precision_micro += precision_score(y_true, y_pred, average='micro')
-        print(top1.avg.item())
+
         end_time = time.time()
         print(end_time - start_time)
+    print(top1.avg.item())
     # print("recall_macro = ",round(recall_macro/batch_count,3))
     # print("acc = ", round(acc / batch_count,3))
     # print("recall_micro = ", round(recall_micro / batch_count,3))
     # print("precision_macro = ", round(precision_macro / batch_count,3))
     # print("precision_micro = ", round(precision_micro / batch_count,3))
 
-#cs,random中代表保留的百分比,
-#o_mean,o_sum代表欧式距离近，数值小就剪枝
-# def search(cfg_list, strategy,iteration):
-#     print('cleanning model_states...')
-#     ls = os.listdir('D:\\datasets\\saved_model\\hrprine\\model_states')
-#     for i in ls:
-#         c_path = os.path.join('D:\\datasets\\saved_model\\hrprine\\model_states', i)
-#         os.remove(c_path)
-#     for i in range(iteration):
-#         # print_logger.info('strategy = %s, thd = %f' % (strategy, thd))
-#         model_mean, model_var = get_prune_model('vgg_full_baseline.pth', cfg_list, strategy)
-#         model_mean_list.append(model_mean)
-#         model_var_list.append(model_var)
-#         top1 = test('D:\\datasets\\saved_model\\hrprine\\tmp\\pruned_'+strategy+'.pth')
-#         top1_list.append(top1)
-        # os.rename('D:\\datasets\\saved_model\\hrprine\\tmp\\pruned_'+str(thd)+'_'+strategy+'.pth','D:\\datasets\\saved_model\\hrprine\\model_states\\pruned_'+str(thd)+'_'+strategy+'_'+str(top1)+'_'+str('nan')+'.pth')
 
 if __name__ == '__main__':
-    # cfg_list = [0, 0, 0, 0,  0, 0, 0,  0, 0, 0,  0, 1, 0]
-    # model_mean_list = []
-    # model_var_list = []
-    # top1_list = []
+
     test()
-    # test('vgg_new.pth')
-    # search(cfg_list, 'random')
-    # plt.figure(1)
-    # plt.subplot(211)
-    # plt.axis([80, 93, 0.0373, 0.03765 ])
-    # plt.plot(top1_list,layer_zeros , 'bo')
-    # plt.subplot(212)
-    # plt.axis([80, 93,1.26735, 1.2677])
-    # plt.plot(top1_list, model_mean_list, 'ro')
-    # plt.show()
+
 
 
