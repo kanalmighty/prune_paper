@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from torch import nn
 
 #模型是这样的，输入3
@@ -23,7 +25,7 @@ class Mobile_Net(nn.Module):
             Conv_Dw(self.cfg[12], self.cfg[13], 1),
             nn.AvgPool2d(7),
         )
-        self.classifier = nn.Linear(self.cfg[13], num_class)
+        self.classifier = nn.Sequential(OrderedDict([('linear1', nn.Linear(self.cfg[13], num_class))]))
 
     def forward(self, x):
         x = self.feature(x)

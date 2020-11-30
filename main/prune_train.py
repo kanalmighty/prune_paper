@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar10',
+    default='cifar100',
     choices=('cifar10','cifar100'),
     help='dataset')
 parser.add_argument(
@@ -45,7 +45,7 @@ parser.add_argument(
     '--resume',
     type=str,
     # default=None,
-    default="resnet_34_cifar10.pth",
+    default="mobile_net_v1_cifar100_pruning.pth",
     help='load the model from the specified checkpoint')
 parser.add_argument(
     '--train_batch_size',
@@ -60,16 +60,16 @@ parser.add_argument(
 parser.add_argument(
     '--prune_rate',
     type=float,
-    default=0.9,
+    default=0.8,
     help='prune rate')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='10')
+    default='100')
 parser.add_argument(
     '--arch',
     type=str,
-    default='resnet_34',
+    default='mobile_net_v1',
     choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
 args = parser.parse_args()
