@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument(
     '--model_name',
     type=str,
-    default='mobile_net_v1_cifar100.pth',
+    default='vgg_16_bn_cifar100.pth',
     help='dataset path')
 parser.add_argument(
     '--data_dir',
@@ -43,7 +43,7 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='mobile_net_v1',
+    default='vgg_16_bn',
     choices=('resnet_34','vgg_16_bn','vgg_19_bn','alexnet','densenet_40','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(

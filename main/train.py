@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar100',
+    default='cifar10',
     choices=('cifar10','cifar100'),
     help='dataset')
 parser.add_argument(
@@ -62,13 +62,13 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='vgg_16_bn',
+    default='resnet_34',
     choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='100'),
+    default='10'),
 parser.add_argument(
     '--drop_train',
     type=str,
@@ -123,7 +123,7 @@ def train_baseline():
             start_epoch = model_state['epoch']
         except KeyError:
             start_epoch = 0
-        end_epoch = start_epoch + 80
+        end_epoch = start_epoch + 180
     else:
         save_path = os.path.join(baseline_dir, args.arch+'_' + args.dataset+'.pth')
         current_model_best_acc = 0

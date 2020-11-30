@@ -376,48 +376,26 @@ def get_prune_model(pretrained_model, thres_cfg, strategy,args):
             all_parameter[name] = parameter[current_output_channel_mask]
             previous_output_mask = current_output_channel_mask
         elif linear1_pattern.match(name) and 'num_batches_tracked' not in name and 'bias' not in name:
-            if 'linear1.weight' in name and args.arch is not 'AlexNet':
+            if 'linear1.weight' in name:
                 all_parameter[name] = parameter[:, current_output_channel_mask]
                 previous_output_mask = current_output_channel_mask
                 newcfg.append(512)
-            elif 'linear1.weight' in name and args.arch =='AlexNet':
+            # elif 'linear1.weight' in name and args.arch =='AlexNet':
                 # drop_index = np.where(current_output_channel_mask==0)[0]
                 # expanded_current_output_channel_mask = torch.ones(len(current_output_channel_mask)*36,dtype=int)
                 # expanded_current_output_channel_mask[drop_index*36: drop_index*36+36] = 0
-                drop_index = np.where(current_output_channel_mask == 0)[0]
-                expand_tensor = torch.ones(36, 1)
-                expanded_current_output_channel_mask = (current_output_channel_mask.long() * expand_tensor.long()).t().reshape(1, -1).squeeze()
-                all_parameter[name] = parameter[:, expanded_current_output_channel_mask.bool()]
-                previous_output_mask = current_output_channel_mask
-
+                # drop_index = np.where(current_output_channel_mask == 0)[0]
+                # expand_tensor = torch.ones(36, 1)
+                # expanded_current_output_channel_mask = (current_output_channel_mask.long() * expand_tensor.long()).t().reshape(1, -1).squeeze()
+                # all_parameter[name] = parameter[:, expanded_current_output_channel_mask.bool()]
+                # previous_output_mask = current_output_channel_mas
             elif (args.arch == 'resnet_56' or args.arch == 'resnet_34') and 'bias' not in name:
                 all_parameter[name] = parameter[:, current_output_channel_mask]
                 previous_output_mask = current_output_channel_mask
-            else:
-                all_parameter[name] = parameter[:, current_output_channel_mask]
-                previous_output_mask = ~current_output_channel_mask
+            # elif 'norm1' in name:
+            #     all_parameter[name] = parameter[current_output_channel_mask]
+                # previous_output_mask = ~current_output_channel_mask
 
-    # vgg_cfg = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 512] 最后两个数字是l1的输入，输出和l2的输入
-    # newcfg.insert(2, 'M')
-    # newcfg.insert(5, 'M')
-    # newcfg.insert(9, 'M')
-    # newcfg.insert(13, 'M')
-
-    # vgg19_cfg = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 512]
-    # newcfg.insert(2, 'M')
-    # newcfg.insert(5, 'M')
-    # newcfg.insert(10, 'M')
-    # newcfg.insert(15, 'M')
-
-    # alexnet_cfg = [64, 'M', 192, 384, 256, 'M', 256, 256]
-    # newcfg.insert(1, 'M')
-    # newcfg.insert(5, 'M')
-
-    #resnet没有最大池化层
-
-    # resnet没有最大池化层
-    # newcfg.insert(0, 64)
-    #resnet34配置
 
     state = {
         'state_dict': all_parameter,

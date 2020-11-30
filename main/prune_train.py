@@ -45,7 +45,7 @@ parser.add_argument(
     '--resume',
     type=str,
     # default=None,
-    default="resnet34_baseline_10_88.71_pruning.pth",
+    default="resnet_34_cifar10.pth",
     help='load the model from the specified checkpoint')
 parser.add_argument(
     '--train_batch_size',
