@@ -244,7 +244,7 @@ def search_by_conv_idx(model_state_dict, origin_cfg,conv_name, conv_idx, conv_li
         pruned_model_state = get_prune_model(model_state_dict['state_dict'], conv_dropout_list, 'fix',args)
         pruned_model_state_dict['state_dict'] = pruned_model_state['state_dict']
         pruned_model_state_dict['cfg'] = utils.resore_cfg_maxpool(origin_cfg, pruned_model_state['cfg'])
-        # top1 = random.randint(-20,80)
+        # top1 = random.randint(-20,90)
         top1 = test_model(pruned_model_state_dict, testloader, args, conv_dropout_list_resnet34)
         # for i in pm.dropout_index:
         #     if isinstance(i, list):
@@ -317,7 +317,7 @@ def test_model(model_state, testloader, args, conv_dropout_list):
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
-            outputs = net(inputs)
+            outputs = net(inputs,conv_dropout_list)
 
             prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
             top1.update(prec1[0], inputs.size(0))
@@ -432,6 +432,32 @@ def get_net_by_prune_dict(net, args, drop_dict):
     # net = reset_kernel_by_list(net, drop_list)
     net = pruned_net.cuda()
     return net, model_state_pruned['cfg']
+
+def get_net_by_prune_dict(net, args, drop_dict):
+    model_state = net.state_dict()
+    print('dropping false kernels and re-train')
+    drop_list = [list(v) if isinstance(v, list) else -1 for k, v in drop_dict.items()]
+    # 把字典处理成数组
+    model_state_pruned = get_prune_model(model_state, drop_list, 'fix', args)
+    restored_cfg = utils.resore_cfg_maxpool(net.origin_cfg, model_state_pruned['cfg'])
+    pruned_net = eval(args.arch)(args.num_class, cfg=restored_cfg)
+    pruned_net.load_state_dict(model_state_pruned['state_dict'])
+    # net = reset_kernel_by_list(net, drop_list)
+    net = pruned_net.cuda()
+    return net, model_state_pruned['cfg']
+
+def get_net_by_prune_dict_rand(cfg, args):
+    print('dropping kernels randomly according to cfg and re-train')
+    drop_list = [list(v) if isinstance(v, list) else -1 for k, v in drop_dict.items()]
+    # 把字典处理成数组
+    model_state_pruned = get_prune_model(model_state, drop_list, 'fix', args)
+    restored_cfg = utils.resore_cfg_maxpool(net.origin_cfg, model_state_pruned['cfg'])
+    pruned_net = eval(args.arch)(args.num_class, cfg=restored_cfg)
+    pruned_net.load_state_dict(model_state_pruned['state_dict'])
+    # net = reset_kernel_by_list(net, drop_list)
+    net = pruned_net.cuda()
+    return net, model_state_pruned['cfg']
+
 
 def clean_status(model_dict,dict_name):
     if dict_name in model_dict:

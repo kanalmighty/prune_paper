@@ -27,7 +27,7 @@ class Mobile_Net(nn.Module):
         )
         self.classifier = nn.Sequential(OrderedDict([('linear1', nn.Linear(self.cfg[13], num_class))]))
 
-    def forward(self, x):
+    def forward(self, x,conv_dropout_list=None):
         x = self.feature(x)
         x = x.view(-1, self.cfg[13])
         x = self.classifier(x)

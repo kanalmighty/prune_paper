@@ -29,7 +29,7 @@ parser.add_argument(
     '--dataset',
     type=str,
     default='cifar100',
-    choices=('cifar10','cifar100'),
+    choices=('cifar10', 'cifar100'),
     help='dataset')
 parser.add_argument(
     '--lr',
@@ -43,11 +43,16 @@ parser.add_argument(
     help='learning rate decay step')
 parser.add_argument(
     '--resume',
-    # type=str,
+    type=str,
+    default='vgg_16_bn_compare.pth',
     # default="none",
-    default='resnet_34_cifar100.pth',
     help='load the model from the specified checkpoint')
-
+parser.add_argument(
+    '--ref_model',
+    type=str,
+    # default=None,
+    default="65.5_vgg16_100_0.8.pth",
+    help='load the model from the specified checkpoint')
 parser.add_argument(
     '--train_batch_size',
     type=int,
@@ -58,89 +63,66 @@ parser.add_argument(
     type=int,
     default=100,
     help='Batch size for validation.')
-
-parser.add_argument(
-    '--arch',
-    type=str,
-    default='resnet_34',
-    choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
-    help='The architecture to prune')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='100'),
+    default='100')
 parser.add_argument(
-    '--drop_train',
+    '--arch',
     type=str,
-    default=None,
+    default='vgg_16_bn',
+    choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
-
 args = parser.parse_args()
 
-best_acc = 0  # best test accuracy
-start_epoch = 0  # start from epoch 0 or last checkpoint epoch
+
 lr_decay_step = list(map(int, args.lr_decay_step.split(',')))
 
 
-print(vars(args))
+
+trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size,args.arch)
 
 project_root_path = os.path.abspath(os.path.dirname(__file__))
-trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batch_size,args.eval_batch_size,args.arch)
+if sys.platform == 'linux':
+    tmp_dir = '/content/drive/MyDrive/'
+else:
+    tmp_dir = os.path.join(project_root_path, 'tmp')
+
+
+if not Path(tmp_dir).exists():
+    os.mkdir(tmp_dir)
+print(vars(args))
 
 # Model
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-
-if sys.platform == 'linux':
-    baseline_dir = '/content/drive/MyDrive/'
-else:
-    baseline_dir = os.path.join(project_root_path, 'baseline')
-
-if not Path(baseline_dir).exists():
-    os.mkdir(baseline_dir)
-
-
-
 # Training
-def train_baseline():
-
-    if args.resume != "none":
-        print('checkpoint %s exists,train from checkpoint' % args.resume)
-        save_path = os.path.join(baseline_dir, args.resume)
-        # model_state = torch.load(args.resume, map_location=device)
-        model_state = get_model(args.resume, device=device)
-        cfg = model_state['cfg']
-        net = eval(args.arch)(args.num_class)
-        current_model_best_acc = model_state['best_prec1']
-        net.load_state_dict(model_state['state_dict'])
-        optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
-        optimizer.load_state_dict(model_state['optimizer'])
-        for state in optimizer.state.values():
-            for k, v in state.items():
-                if torch.is_tensor(v):
-                    state[k] = v.cuda()
-        try:
-            start_epoch = model_state['epoch']
-        except KeyError:
-            start_epoch = 0
-        end_epoch = start_epoch + 280
+def compare_train():
+    if args.resume == 'none':
+        save_path = os.path.join(tmp_dir, args.arch+'_compare.pth')
+        model_state_pre_best = get_model(args.ref_model, device=device)
+        best_acc = 0  # best test accuracy
+        cfg = model_state_pre_best['cfg']
+        net_pruned = eval(args.arch)(args.num_class, cfg=cfg)
+        net_pruned.to(device)
+        optimizer = optim.SGD(net_pruned.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
     else:
-        save_path = os.path.join(baseline_dir, args.arch+'_' + args.dataset+'.pth')
-        current_model_best_acc = 0
-        net = eval(args.arch)(args.num_class)
-        cfg = net.cfg
-        optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
-        start_epoch = 0
-        end_epoch = 100
 
-    net = net.to(device)
-    cudnn.benchmark = True
-    print('\nEpoch: %d' % start_epoch)
-    fake_drop_out_list = [-1 for i in range(31)]
+        model_state_pre_best = get_model(args.resume, device=device)
+        best_acc = model_state_pre_best['lasted_best_prec1']
+        save_path = os.path.join(tmp_dir, args.resume)
+        cfg = model_state_pre_best['cfg']
+        net_pruned = eval(args.arch)(args.num_class, cfg=cfg)
+        net_pruned.load_state_dict(model_state_pre_best['state_dict'])
+        net_pruned.to(device)
+        optimizer = optim.SGD(net_pruned.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+        optimizer.load_state_dict(model_state_pre_best['optimizer'])
 
+    end_epoch = 100
+    start_epoch = 0  # start from epoch 0 or last checkpoint epoch
     criterion = nn.CrossEntropyLoss()
-    for epoch in range(start_epoch+1, end_epoch):
-        net.train()
+    for epoch in range(start_epoch + 1, end_epoch):
+        net_pruned.train()
         train_loss = 0
         correct = 0
         total = 0
@@ -149,7 +131,7 @@ def train_baseline():
                 inputs = inputs.to(device)
                 targets = targets.to(device)
                 optimizer.zero_grad()
-                outputs = net(inputs)
+                outputs = net_pruned(inputs)
                 loss = criterion(outputs, targets)
                 loss.backward()
                 optimizer.step()
@@ -159,17 +141,17 @@ def train_baseline():
                 total += targets.size(0)
                 correct += predicted.eq(targets).sum().item()
 
-                print(batch_idx,len(trainloader),
-                             ' Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                             % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+                # print(batch_idx,len(trainloader),
+                #              ' Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                #              % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
         top1 = utils.AverageMeter()
         top5 = utils.AverageMeter()
-        net.eval()
+        net_pruned.eval()
         num_iterations = len(testloader)
         with torch.no_grad():
             for batch_idx, (inputs, targets) in enumerate(testloader):
                 inputs, targets = inputs.to(device), targets.to(device)
-                outputs = net(inputs)
+                outputs = net_pruned(inputs)
 
                 prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
                 top1.update(prec1[0], inputs.size(0))
@@ -180,19 +162,20 @@ def train_baseline():
                 'Prec@1(1,5) {top1.avg:.2f}, {top5.avg:.2f}'.format(
                     epoch, batch_idx, num_iterations, top1=top1, top5=top5))
 
-        if (top1.avg.item() > current_model_best_acc):
-            current_model_best_acc = top1.avg.item()
+        if (top1.avg.item() > best_acc):
+            print('当前测试精度%f大于当前层剪枝周期的最号精度%f,保存模型%s)' % (
+            top1.avg.item(), best_acc, save_path))
+
+            best_acc = top1.avg.item()
+
             model_state = {
-                'state_dict': net.state_dict(),
-                'best_prec1': current_model_best_acc,
+                'state_dict': net_pruned.state_dict(),
+                'lasted_best_prec1': round(best_acc, 2),
                 'epoch': epoch,
                 'optimizer': optimizer.state_dict(),
                 'cfg': cfg,
             }
-
             torch.save(model_state, save_path)
-
-    print("=>Best accuracy {:.3f}".format(model_state['best_prec1']))
 
 
 
@@ -206,5 +189,5 @@ def train_baseline():
 
 
 if __name__ == '__main__':
-    train_baseline()
+    compare_train()
     # drop_then_train()

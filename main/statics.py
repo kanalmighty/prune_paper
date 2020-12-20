@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument(
     '--model_name',
     type=str,
-    default='vgg_16_bn_cifar100.pth',
+    default='65.54_resnet_100_0.8.pth',
     help='dataset path')
 parser.add_argument(
     '--data_dir',
@@ -43,7 +43,7 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='vgg_16_bn',
+    default='resnet_34',
     choices=('resnet_34','vgg_16_bn','vgg_19_bn','alexnet','densenet_40','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(
@@ -108,7 +108,7 @@ def test():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
 
-            outputs = net(inputs)
+            outputs = net(inputs,total_drop_list_resnet34)
 
             prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
             top1.update(prec1[0], inputs.size(0))

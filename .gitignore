@@ -9,3 +9,4 @@ models/__pycache__
 /main/results/
 /main/resnet34
 /BindHelper.py
+/main/compare_model
