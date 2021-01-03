@@ -14,8 +14,9 @@ from torchstat import stat
 import utils as utils
 import torch.nn.functional as F
 from mobilenetv1 import mobile_net_v1
-
-from models import *
+#
+# from models import *
+from network_sliming.vgg_ns import vgg_16_bn,vgg_19_bn
 from resnet34 import resnet_34
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 layer_mean = []
@@ -322,7 +323,7 @@ def test_model(model_state, testloader, args, conv_dropout_list):
             prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
             top1.update(prec1[0], inputs.size(0))
             top5.update(prec5[0], inputs.size(0))
-    prune_threshold = model_state['lasted_best_prec1']
+    prune_threshold = model_state['lasted_best_prec1']*100#临时处理一下
     if top1.avg.item() > prune_threshold:
        print("top1为%f,阈值为%f,drop该卷积核"%(top1.avg.item(),prune_threshold))
     return round(top1.avg.item(), 2)

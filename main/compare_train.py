@@ -44,14 +44,14 @@ parser.add_argument(
 parser.add_argument(
     '--resume',
     type=str,
-    default='vgg_16_bn_compare.pth',
+    default='resnet_34_compare_0.9.pth',
     # default="none",
     help='load the model from the specified checkpoint')
 parser.add_argument(
     '--ref_model',
     type=str,
     # default=None,
-    default="65.5_vgg16_100_0.8.pth",
+    default="66.82_resnet_100_0.9.pth",
     help='load the model from the specified checkpoint')
 parser.add_argument(
     '--train_batch_size',
@@ -70,7 +70,7 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='vgg_16_bn',
+    default='resnet_34',
     choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
 args = parser.parse_args()

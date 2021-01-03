@@ -14,16 +14,14 @@ from sklearn import metrics
 import os
 import argparse
 
-from models import AlexNet
-
-from models import *
+from network_sliming.vgg_ns import vgg_16_bn,vgg_19_bn
 from utils import get_loaders
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument(
     '--model_name',
     type=str,
-    default='65.54_resnet_100_0.8.pth',
+    default='vgg16_ns_10_0.2_tuned.pth',
     help='dataset path')
 parser.add_argument(
     '--data_dir',
@@ -33,7 +31,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar100',
+    default='cifar10',
     help='dataset')
 parser.add_argument(
     '--eval_batch_size',
@@ -43,13 +41,13 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='resnet_34',
+    default='vgg_16_bn',
     choices=('resnet_34','vgg_16_bn','vgg_19_bn','alexnet','densenet_40','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='100'),
+    default='10'),
 args = parser.parse_args()
 args.train_batch_size = 128
 #os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
@@ -71,7 +69,7 @@ trainloader,testloader = get_loaders(args.dataset, args.data_dir,args.train_batc
 def test():
     model_state = get_model(args.model_name, device=device)
     cfg = model_state['cfg']
-    net = eval(args.arch)(args.num_class,cfg=cfg)
+    net = eval(args.arch)(args.num_class, cfg=cfg)
 
     if 'state_dict' in model_state.keys():
         net.load_state_dict(model_state['state_dict'])

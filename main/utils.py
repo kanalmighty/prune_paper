@@ -108,10 +108,10 @@ def get_loaders(dataset,data_dir,train_batch_size, eval_batch_size,network):
 
         trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True, download=True,
                                                 transform=transform_train)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=train_batch_size, shuffle=True)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=train_batch_size, shuffle=True,drop_last=True)
 
         testset = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=transform_test)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=eval_batch_size, shuffle=False)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=eval_batch_size, shuffle=False,drop_last=True)
     elif dataset == 'cifar100':
         trainset = torchvision.datasets.CIFAR100(root=data_dir, train=True, download=True,
                                                  transform=transform_train)
@@ -119,7 +119,7 @@ def get_loaders(dataset,data_dir,train_batch_size, eval_batch_size,network):
 
         testset = torchvision.datasets.CIFAR100(root=data_dir, train=False, download=True,
                                                 transform=transform_test)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=eval_batch_size, shuffle=False)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=eval_batch_size, shuffle=False,drop_last=True)
     else:
         assert 1 == 0
 

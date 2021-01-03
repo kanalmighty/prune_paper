@@ -16,7 +16,7 @@ import utils
 from anal_utils import reset_kernel_by_list, get_model, get_conv_name_list, get_net_by_prune_dict, \
     get_conv_idx_by_name, search_by_conv_idx
 from resnet34 import resnet_34
-from models import *
+from network_sliming.vgg_ns import *
 from utils import get_loaders
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar100',
+    default='cifar10',
     choices=('cifar10','cifar100'),
     help='dataset')
 parser.add_argument(
@@ -45,7 +45,7 @@ parser.add_argument(
     '--resume',
     # type=str,
     # default="none",
-    default='resnet_34_cifar100.pth',
+    default='vgg16_ns_10_0.2.pth',
     help='load the model from the specified checkpoint')
 
 parser.add_argument(
@@ -62,13 +62,13 @@ parser.add_argument(
 parser.add_argument(
     '--arch',
     type=str,
-    default='resnet_34',
+    default='vgg_16_bn',
     choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
 parser.add_argument(
     '--num_class',
     type=int,
-    default='100'),
+    default='10'),
 parser.add_argument(
     '--drop_train',
     type=str,

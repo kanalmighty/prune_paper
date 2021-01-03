@@ -16,7 +16,7 @@ import utils
 from anal_utils import reset_kernel_by_list, get_model, get_conv_name_list, get_net_by_prune_dict, \
     get_conv_idx_by_name, search_by_conv_idx
 from resnet34 import resnet_34
-from models import *
+from network_sliming.vgg_ns import vgg_16_bn,vgg_19_bn
 from utils import get_loaders
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -28,7 +28,7 @@ parser.add_argument(
 parser.add_argument(
     '--dataset',
     type=str,
-    default='cifar100',
+    default='cifar10',
     choices=('cifar10', 'cifar100'),
     help='dataset')
 parser.add_argument(
@@ -45,7 +45,7 @@ parser.add_argument(
     '--resume',
     type=str,
     # default=None,
-    default="resnet_34_cifar100_pruning.pth",
+    default="vgg16_ns_10_base.pth",
     help='load the model from the specified checkpoint')
 parser.add_argument(
     '--train_batch_size',
@@ -65,11 +65,11 @@ parser.add_argument(
 parser.add_argument(
     '--num_class',
     type=int,
-    default='100')
+    default='10')
 parser.add_argument(
     '--arch',
     type=str,
-    default='resnet_34',
+    default='vgg_16_bn',
     choices=('AlexNet', 'vgg_16_bn','resnet_34','vgg_19_bn','mobile_net_v1'),
     help='The architecture to prune')
 args = parser.parse_args()
@@ -142,7 +142,11 @@ def prune_train():
 
         # 剪枝某一层时初始化当前层最好精度为0
         lasted_best_prec1 = 0
-        cfg = model_state_pre_best['cfg']
+
+        try:
+            cfg = model_state_pre_best['cfg']
+        except KeyError:
+            cfg = None
         net_pre_best = eval(args.arch)(args.num_class, cfg=cfg)
         net_pre_best.load_state_dict(model_state_pre_best['state_dict'])
         optimizer = optim.SGD(net_pre_best.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
